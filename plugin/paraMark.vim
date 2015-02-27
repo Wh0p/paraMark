@@ -23,21 +23,35 @@
 " ================================================== 
 " This function finds the position, where the current argument ends
 " The function doesn't move the cursor
-function s:FindArgEnd()
+function! s:FindArgEnd()
   " cache the initial cursor position
   let initpos = getpos('.')
   let done = 0
+  let err = 0
   while done == 0
     " find the next ',' ')' '<' or '('
-    call search(',\|(\|<\|)')
+    if search(',\|(\|<\|)') == 0
+      echo 'parameter list parsing error'
+      let done = 1
+      let err = 1
+    endif
+
     let c = getline('.')[col('.') - 1]
     " if the current char is an opening bracket '(' or '<'
     " skip to the corresponding closing bracket
     " any other character terminates the search
     if c == '('
-      call searchpair('(', '', ')')
+     if searchpair('(', '', ')') <= 0
+        echo 'parameter list pasring error no matching ('
+        let done = 1
+        let err = 1
+      endif
     elseif c == '<'
-      call searchpair('<', '', '>')
+      if searchpair('<', '', '>') <= 0
+        echo 'parameter list pasring error no matching <'
+        let done = 1
+        let err = 1
+      endif
     else
       let done = 1
     endif
@@ -48,27 +62,46 @@ function s:FindArgEnd()
   let end = getpos('.')
   let end[2] = end[2] - 1
   call setpos('.', initpos)
-  return end
+  if err == 1
+    return initpos
+  else
+    return end
+  endif
 endfunction
 
 
 " This function finds the position, where the current argument begins
 " The function doesn't move the cursor
-function s:FindArgBeg()
+function! s:FindArgBeg()
   " cache the initial cursor position
   let initpos = getpos('.')
   let done = 0
+  let err = 0
   while done == 0
     " reverse find the next ',' '(' '>' or ')'
-    call search(',\|)\|>\|(', 'b')
+    if search(',\|)\|>\|(', 'b') == 0
+      echo 'parameter list parsing error'
+      let done = 1
+      let err = 1
+    endif
+
+
     let c = getline('.')[col('.') - 1]
     " if the current char is a closing bracket ')' or '>'
     " skip to the corresponding opening bracket
     " any other character terminates the search
     if c == ')'
-      call searchpair('(', '', ')', 'b')
+      if searchpair('(', '', ')', 'b') <= 0
+        echo 'parameter list pasring error no matching ('
+        let done = 1
+        let err = 1
+      endif
     elseif c == '>'
-      call searchpair('<', '', '>', 'b')
+      if searchpair('<', '', '>', 'b') <= 0
+        echo 'parameter list pasring error no matching <'
+        let done = 1
+        let err = 1
+      endif
     else
       let done = 1
     endif
@@ -79,13 +112,17 @@ function s:FindArgBeg()
   let end = getpos('.')
   let end[2] = end[2] + 1
   call setpos('.', initpos)
-  return end
+  if err == 1
+    return initpos
+  else
+    return end
+  endif
 endfunction
 
 
 " This function retrieves the bounds of the 
 " function argument the cursor currently resides
-function s:FindArgBounds()
+function! s:FindArgBounds()
   return [s:FindArgBeg(), s:FindArgEnd()]
 endfunction
 
