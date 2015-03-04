@@ -1,0 +1,123 @@
+*paraMark.txt*	For Vim version 7.3 and above	Last change: 2015 Mar 04
+
+			       ----------
+ 			        paraMark
+			       ----------
+
+Author:  Daniel Opitz
+
+==============================================================================
+						*paraMark* *paraMark-contents*
+1. Contents~
+
+	1. Contents .............................: |paraMark-contents|
+	2. About ................................: |paraMark-about|
+	3. Features .............................: |paraMark-features|
+	4. Configuration ........................: |paraMark-configure|
+	5. ThisArg ..............................: |paraMark-thisarg|
+	6. NextArg ..............................: |paraMark-nextarg|
+        7. CpyParamList .........................: |paraMark-cpyparamlist|
+        A. Change History .......................: |paraMark-changes|
+
+==============================================================================
+							*paraMark-about*
+2. About~
+
+Paramark is designed to allow you to mark parmeters in C-style functions 
+parameter lists in visual mode. So that one can cycle though the arguments
+of a function and easisy modify them. Originally this was a workaround of
+ycm's lack of function parameter completion. So I started copying the 
+parameter lists from the preview window to cope...
+
+==============================================================================
+							*paraMark-features*
+3. Features~
+
+Paramark has the following features:
+
+  - Mark the argument of the parameter list that is currently under the cursor.
+  - Mark the next argument of the parameter list that is currently under the cursor.
+  - Copy the parameter list of a function that is shown in the preview window.
+
+==============================================================================
+							*paraMark-configure*
+4. Configuration~
+
+This scrips is so small it does not deserve any setup/configuration. In fact 
+there is no such thing since this script delivers 3 commands that do simple 
+stuff that does not need to be configured.
+
+However I recommend to define shortcuts ion your .vimrc like those:
+	nnoremap <C-A> :ThisArg<CR>
+	inoremap <C-A> <ESC>:NextArg<CR>
+	vnoremap <C-A> <ESC>:NextArg<CR>
+	
+	inoremap <C-D>1 :CpyParamList 1<CR>
+	inoremap <C-D>2 :CpyParamList 2<CR>
+	inoremap <C-D>3 :CpyParamList 3<CR>
+	inoremap <C-D>4 :CpyParamList 4<CR>
+	inoremap <C-D>5 :CpyParamList 5<CR>
+	inoremap <C-D>6 :CpyParamList 6<CR>
+	inoremap <C-D>7 :CpyParamList 7<CR>
+	inoremap <C-D>8 :CpyParamList 8<CR>
+	inoremap <C-D>9 :CpyParamList 9<CR>
+	inoremap <C-D>0 :CpyParamList 10<CR>
+
+Yeah I know, but there are no functions with more than 10 overloads, if there
+are start using hex numbers or whatever you like...
+
+==============================================================================
+							*paraMark-thisarg*
+5. ThisArg~
+
+This command is used to mark the argument/parameter that is currently under
+the cursor position in visual mode. CAUTION: ThisArg failes horribly when the cursor is not
+inside a parameter list, that is some text that is enclosed within '(' and
+')'. In this case nothing will happen. Example for marking the parameter:
+	
+	     initial cursor pos
+	      v
+	foo (some, arguments, bar);
+	     ^  ^
+	     start/end of selection
+
+==============================================================================
+							*paraMark-nextarg*
+6. NextArg~
+
+This command is used to mark the following argument/parameter that is
+currently under the cursor position in visual mode. If the last argument of
+the parameter list is selected the function cycles back to the first one. 
+CAUTION: NextArg fails horribly when the cursor is not inside a parameter
+list, that is some text that is enclosed within '(' and ')'. In this case
+nothing will happen. Example for marking the parameter:
+	
+	     initial cursor pos
+	      v
+	foo (some, arguments, bar);
+	          ^        ^
+	     start/end of selection
+
+			initial cursor pos
+	                      v
+	foo (some, arguments, bar);
+	     ^  ^
+	     start/end of selection
+
+==============================================================================
+							*paraMark-cpyparamlist*
+7. CpyParamList~
+
+This command is used to copy the parameter list of a functions that is listed
+in the preview window. If multiple overloads are listed one can select which
+is chosen by passing a number. Example:
+
+	:CpyParamList 3  - Copies the 3rd overload counting from the top
+
+==============================================================================
+							*paraMark-changes*
+A. Change History~
+
+	- None so far...
+
+vim:tw=78:sts=8:ts=8:sw=8:noet:ft=help:
