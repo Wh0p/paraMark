@@ -159,8 +159,45 @@ function! <SID>FindNextArg()
 endfunction
 
 
+
+
+
+" ================================================== 
+" MAIN FUNCTION FOR COPYING THE PARAMETER LIST FROM THE YCM PREVIEW WINDOW
+" ================================================== 
+func! <SID>CopyParamList(line)
+  " switch to the preview window goto the end of line 'line' and search the first ')' backwards
+  silent! wincmd P
+  execute "normal! " . a:line . "G0"
+  call search('(', '', line('.'))
+  " save the end pos of the parameter list
+  let beg = getpos('.')
+  " search for the matching opening bracket
+  let res = searchpair('(', '', ')')
+  if res > 0
+    " if found copy the parameter list using visual mode
+    let end = getpos('.')
+    call setpos("'<", beg)
+    call setpos("'>", end)
+    normal! gvy
+    " return to the initial pos in the original file and paste the copied parameter list
+    silent! wincmd p
+    normal! p$h
+  else
+    echo "Error when parsing function parameter list"
+  endif
+endfunction
+
+
+
 " ================================================== 
 " PUBLIC COMMANDS
 " ================================================== 
 command! -nargs=0 ThisArg :call <SID>FindThisArg()
 command! -nargs=0 NextArg :call <SID>FindNextArg()
+command! -nargs=1 CpyParamList :call <SID>CopyParamList(<f-args>)
+
+
+
+
+
