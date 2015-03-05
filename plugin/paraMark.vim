@@ -17,6 +17,16 @@
 " ================================================================================  
 
 
+if (exists("g:disable_paraMark"))
+  finish
+endif
+
+if v:version < 700
+  echoerr "Vim version ist < 7.0, which is totally fine with paraMark. But dude upgrade you vim...
+endif
+
+
+
 
 " ================================================== 
 " HELPER FUNCTIONS
@@ -62,11 +72,9 @@ function! s:FindArgEnd()
   let end = getpos('.')
   let end[2] = end[2] - 1
   call setpos('.', initpos)
-  if err == 1
-    return initpos
-  else
-    return end
-  endif
+  " insert the error as the first list element and return the position
+  call insert(end, err, 0)
+  return end
 endfunction
 
 
@@ -112,18 +120,16 @@ function! s:FindArgBeg()
   let end = getpos('.')
   let end[2] = end[2] + 1
   call setpos('.', initpos)
-  if err == 1
-    return initpos
-  else
-    return end
-  endif
+  call insert(end, err, 0)
+  return end
 endfunction
 
 
 " This function retrieves the bounds of the 
 " function argument the cursor currently resides
 function! s:FindArgBounds()
-  return [s:FindArgBeg(), s:FindArgEnd()]
+  let bounds = [s:FindArgBeg(), s:FindArgEnd()]
+  return [bounds[0][0] + bounds[1][0], bounds[0][1 :], bounds[1][1 :]]
 endfunction
 
 
@@ -134,16 +140,25 @@ endfunction
 " Marks the argument, where the cursor currently resides in visual mode
 function! <SID>FindThisArg()
   let bounds = s:FindArgBounds()
-  call setpos("'<", bounds[0])
-  call setpos("'>", bounds[1])
-  normal! gv
+  if bounds[0] == 0
+    call setpos("'<", bounds[1])
+    call setpos("'>", bounds[2])
+    normal! gv
+  else
+    echoerr "Parsing error make sure the cursor is inside a parameter list."
+  endif
 endfunction
 
 " Marks the next argument, where the cursor currently resides in visual mode
 function! <SID>FindNextArg()
   " find the end of the current argument and set the cursor position
   let p = s:FindArgEnd()
-  call setpos('.', p)
+  if p[0] != 0
+    echoerr 'Parsing error. Make sure the cursor is inside a parameter list.'
+    return
+  endif
+
+  call setpos('.', p[1 :])
   " check if the ending char is a closing bracket
   " if so, this is the last argument in the function -> cycle back to first
   " if not advance cursor and mark the current argument
@@ -184,7 +199,7 @@ func! <SID>CopyParamList(line)
     silent! wincmd p
     normal! p$h
   else
-    echo "Error when parsing function parameter list"
+    echoerr "Error when parsing function parameter list"
   endif
 endfunction
 
