@@ -1,8 +1,8 @@
 *paraMark.txt*	For Vim version 7.3 and above	Last change: 2015 Mar 04
 
-			       ----------
- 			        paraMark
-			       ----------
+			>>>>>>>>>>>><<<<<<<<<<<<
+			>>>>>>> paraMark <<<<<<<
+			>>>>>>>>>>>><<<<<<<<<<<<
 
 Author:  Daniel Opitz
 
