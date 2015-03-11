@@ -40,11 +40,12 @@ function! s:FindArgEnd()
   let err = 0
   while done == 0
     " find the next ',' ')' '<' or '('
-    if search(',\|(\|<\|)') == 0
+    if search(',\|(\|<\|)', 'W') == 0
       echo 'parameter list parsing error'
       let done = 1
       let err = 1
     endif
+
 
     let c = getline('.')[col('.') - 1]
     " if the current char is an opening bracket '(' or '<'
@@ -87,7 +88,7 @@ function! s:FindArgBeg()
   let err = 0
   while done == 0
     " reverse find the next ',' '(' '>' or ')'
-    if search(',\|)\|>\|(', 'b') == 0
+    if search(',\|)\|>\|(', 'bW') == 0
       echo 'parameter list parsing error'
       let done = 1
       let err = 1
@@ -145,7 +146,7 @@ function! <SID>FindThisArg()
     call setpos("'>", bounds[2])
     normal! gv
   else
-    echoerr "Parsing error make sure the cursor is inside a parameter list."
+    echoerr "Parsing error make sure the cursor is inside a parameter list that is not empty."
   endif
 endfunction
 
@@ -154,7 +155,7 @@ function! <SID>FindNextArg()
   " find the end of the current argument and set the cursor position
   let p = s:FindArgEnd()
   if p[0] != 0
-    echoerr 'Parsing error. Make sure the cursor is inside a parameter list.'
+    echoerr 'Parsing error. Make sure the cursor is inside a parameter list that is not empty.'
     return
   endif
 
@@ -199,7 +200,7 @@ func! <SID>CopyParamList(line)
     silent! wincmd p
     normal! p$h
   else
-    echoerr "Error when parsing function parameter list"
+    echoerr "Error when parsing function parameter list."
   endif
 endfunction
 
